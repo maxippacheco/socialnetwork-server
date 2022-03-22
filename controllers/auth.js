@@ -1,4 +1,5 @@
 const bcryptjs = require('bcryptjs');
+const generateJWT = require('../helpers/create-jwt');
 const User = require('../models/user');
 
 const register = async(req, res) => {
@@ -19,7 +20,7 @@ const register = async(req, res) => {
 		});
 		
 	} catch (error) {
-		res.status(401).json({
+		res.status(400).json({
 			ok: false,
 			msg: 'there was a problem'
 		})
@@ -32,10 +33,45 @@ const register = async(req, res) => {
 
 const login = async(req, res) => {
 
-	//TODO: verify email
-	// TODO: compare password
-	// TODO: create token
-	// TODO: Trycatch 
+	const { email, password1, password2 } = req.body;
+
+	try {
+		
+		const userDB = await User.findOne({ email });
+
+		if (!userDB) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'The email does not exist!'
+			})
+		}
+
+		const is_validPassword = bcryptjs.compareSync( password1, userDB.password );
+
+		if ( !is_validPassword && password1 !== password2 ) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'The password is not valid'
+			})
+		}
+
+		const token = await generateJWT( userDB.id );
+
+		res.json({
+			ok: true,
+			token,
+			userDB
+		})
+
+
+	} catch (error) {
+		res.status(400).json({
+			ok: false,
+			msg: 'there was a problem'
+		})
+		console.log(error);		
+	}
+ 
 
 }
 
@@ -58,7 +94,7 @@ const getUsers = async(req, res) => {
 		})
 
 	} catch (error) {
-		res.status(401).json({
+		res.status(400).json({
 			ok: false,
 			msg: 'there was a problem'
 		})
@@ -72,5 +108,6 @@ const getUsers = async(req, res) => {
 
 module.exports = {
 	register,
+	login,
 	getUsers
 }

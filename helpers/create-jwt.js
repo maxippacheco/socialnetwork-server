@@ -1,4 +1,4 @@
-const jwt = reuqire('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const generateJWT = ( uid ) => {
 

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { register, getUsers, login } = require('../controllers/auth');
 
+// TODO: VALIDATION
 
 const router = Router();
 

@@ -19,8 +19,6 @@ router.post('/login/google', (req, res) => {
 		msg: 'Hola mundo'
 	})
 });
-
-
-
+	
 
 module.exports = router;

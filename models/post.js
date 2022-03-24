@@ -8,10 +8,23 @@ const PostSchema = new Schema({
 	},
 	user_id:{
 		type: Schema.Types.ObjectId,
-		ref: 'User'
+		ref: 'User',
+		required: true
+	},
+	img: { 
+		type: String
 	},
 	likes: [{type: Schema.Types.ObjectId, ref: 'User'}],
 	retweet: [{type: Schema.Types.ObjectId, ref: 'User'}],
-});
+
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+PostSchema.methods.toJSON = function() {
+	const { __v, _id, ...data } = this.toObject();
+	
+	data.id = _id;
+	
+	return data;
+}
 
 module.exports = model( 'Post', PostSchema );

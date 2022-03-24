@@ -1,10 +1,20 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { createPost, likePost, removeLike, getPost, commentPost } = require("../controllers/post");
+const { 
+	createPost, 
+	likePost, 
+	removeLike, 
+	getPost, 
+	commentPost, 
+	retweetPost, 
+	removeRetweet
+} = require("../controllers/post");
 const validateFields = require("../middlewares/validate-fields");
 const { validateJWT } = require("../middlewares/validate-jwt");
 
 const router = Router();
+
+// TODO: validations 
 
 router.post('/',[
 	validateJWT,
@@ -32,5 +42,17 @@ router.post('/comment/:id',[
 router.get('/:id', [
 	validateFields
 ], getPost);
+
+
+router.put('/retweet/:id', [
+	validateJWT,
+	validateFields
+], retweetPost);
+
+router.put('/retweet/remove/:id', [
+	validateJWT,
+	validateFields
+], removeRetweet);
+
 
 module.exports = router;

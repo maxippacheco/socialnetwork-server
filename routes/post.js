@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { createPost, likePost, removeLike } = require("../controllers/post");
+const { createPost, likePost, removeLike, getPost, commentPost } = require("../controllers/post");
 const validateFields = require("../middlewares/validate-fields");
 const { validateJWT } = require("../middlewares/validate-jwt");
 
@@ -23,6 +23,14 @@ router.put('/like/remove/:id',[
 	validateFields
 ], removeLike);
 
+router.post('/comment/:id',[
+	validateJWT,
+	validateFields
+], commentPost);
 
+
+router.get('/:id', [
+	validateFields
+], getPost);
 
 module.exports = router;

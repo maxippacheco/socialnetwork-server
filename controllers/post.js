@@ -1,3 +1,4 @@
+const Comment = require("../models/comment");
 const Post = require("../models/post");
 
 
@@ -91,6 +92,54 @@ const removeLike = async(req, res) => {
 }
 
 const commentPost = async(req, res) => {
+
+	// FIX
+	const { text } = req.body;
+	const { id } = req.params;
+
+	const post = await Post.findById(id);
+
+	if( !post ){
+		return res.status(404).json({
+			ok: false,
+			message: 'Post not found',
+		});
+	}
+
+	const comment = new Comment( { text, post_id: id, user_id: req.uid } );
+
+	post.comments.push(comment.id);
+
+	await comment.save();
+	await post.save();
+
+
+	res.json({
+		ok: true,
+		message: 'Comment saved',
+		comment,
+		post
+	})
+}
+
+const getPost = async(req, res) => {
+	
+	const { id } = req.params;
+
+	const post = await Post.findById(id).populate('comments')
+
+	if( !post ){
+		return res.status(404).json({
+			ok: false,
+			message: 'Post not found',
+		});
+	}
+
+	res.json({
+		ok: true,
+		post
+	});
+
 }
 
 
@@ -105,4 +154,6 @@ module.exports = {
 	createPost,
 	likePost,
 	removeLike,
+	commentPost,
+	getPost
 }

@@ -41,6 +41,8 @@ const followUser = async(req, res) => {
 	})
 }
 
+// TODO: UNFOLLOW USER
+
 const getFollowers = async(req, res) => {
 
 	const { id } = req.params;

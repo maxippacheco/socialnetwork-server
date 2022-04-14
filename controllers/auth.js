@@ -1,13 +1,14 @@
 const bcryptjs = require('bcryptjs');
 const generateJWT = require('../helpers/create-jwt');
+const { googleVerify } = require('../helpers/google-verify');
 const User = require('../models/user');
 
 const register = async(req, res) => {
 	
 	try {
 		
-		const { username, email, password } = req.body;
-		const user = new User({ username, email, password });
+		const { username, name , email, password } = req.body;
+		const user = new User({ username, name, email, password });
 		
 		const salt = bcryptjs.genSaltSync();
 		user.password = bcryptjs.hashSync(password, salt);
@@ -46,7 +47,7 @@ const login = async(req, res) => {
 			})
 		}
 
-		const is_validPassword = bcryptjs.compareSync( password1, userDB.password );
+		const is_validPassword = await bcryptjs.compareSync( password1, userDB.password );
 
 		if ( !is_validPassword && password1 !== password2 ) {
 			return res.status(400).json({
@@ -73,6 +74,71 @@ const login = async(req, res) => {
 	}
  
 
+}
+
+const loginWithGoogle = async(req, res) => {
+
+	const { id_token } = req.body;
+
+	try {
+		
+		const { email, name, img } = await googleVerify( id_token );
+
+		let user = await User.findOne({ email })
+
+		if ( !user ) {
+			
+			const data = {
+				username: email.split("@")[0],
+				name,
+				email,
+				img,
+				password: ':)',
+				google: true
+			}
+
+			user = await new User(data);
+
+			await user.save();
+
+		}
+
+
+		const token = await generateJWT( user.id );
+
+		res.json({
+			ok : true,
+			token,
+			user
+		})
+
+	} catch (error) {
+		res.status(400).json({
+			ok: false,
+			msg: 'there was a problem'
+		})
+		console.log(error);		
+	}
+
+
+}
+
+const renewToken = async(req, res) => {
+
+	const uid = req.uid;
+
+	// Gemerar un nuevo JWT
+	const token = await generateJWT( uid );
+
+	//USUARIO
+	const user = await User.findById( uid );
+
+
+	res.json({
+		ok: true,
+		user,
+		token
+	});
 }
 
 
@@ -105,9 +171,41 @@ const getUsers = async(req, res) => {
 
 }
 
+const getUserByUsername = async(req, res) => {
+	try {
+		
+		const { username } = req.params;
+		const query = { username };
+		
+		const user = await User.findOne(query);
+		
+		if (!user) {
+			return res.status(400).json({
+				ok: false,
+				msg: 'The user does not exist!'
+			})
+		}
+
+		res.json({
+			ok: true,
+			user
+		})
+
+
+	} catch (error) {
+		res.status(400).json({
+			ok: false,
+			msg: 'there was a problem'
+		})
+		console.log(error);
+	}
+}
 
 module.exports = {
 	register,
 	login,
-	getUsers
+	loginWithGoogle,
+	renewToken,
+	getUsers,
+	getUserByUsername,
 }

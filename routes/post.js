@@ -7,7 +7,8 @@ const {
 	getPost, 
 	commentPost, 
 	retweetPost, 
-	removeRetweet
+	removeRetweet,
+	getPosts
 } = require("../controllers/post");
 const validateFields = require("../middlewares/validate-fields");
 const { validateJWT } = require("../middlewares/validate-jwt");
@@ -42,6 +43,12 @@ router.post('/comment/:id',[
 router.get('/:id', [
 	validateFields
 ], getPost);
+
+router.get('/', [
+	validateJWT,
+	validateFields
+], getPosts);
+
 
 
 router.put('/retweet/:id', [

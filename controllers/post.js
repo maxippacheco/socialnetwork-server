@@ -199,11 +199,35 @@ const commentPost = async (req, res) => {
   await comment.save();
   await post.save();
 
+  const comment_populated = await Comment.populate(comment, {
+    path: "user_id",
+    model: "User",
+    select: "name email username _id",
+  })
+
+  const post_populated = await Post.populate(post,
+    [{
+      path: "user_id",
+      model: "User",
+      select: "name email username _id",
+    },
+    {
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "user_id",
+        model: "User",
+        select: "name email username _id",
+      }
+    }]
+  )
+
+
   res.json({
     ok: true,
     message: "Comment saved",
-    comment,
-    post,
+    comment: comment_populated,
+    post: post_populated,
   });
 };
 
@@ -248,10 +272,11 @@ const getPosts = async (req, res) => {
             select: 'name email username _id'
           }
         },
-
       ])
-      .sort({ createdAt: 1 }),
+      .sort({ createdAt: -1 }),
+      // TODO: resolve this
   ]);
+
 
   res.json({
     ok: true,

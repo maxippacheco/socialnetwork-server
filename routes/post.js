@@ -10,6 +10,7 @@ const {
 	removeRetweet,
 	getPosts
 } = require("../controllers/post");
+const { isValidPostById } = require("../helpers/db-validations");
 const validateFields = require("../middlewares/validate-fields");
 const { validateJWT } = require("../middlewares/validate-jwt");
 
@@ -25,22 +26,31 @@ router.post('/',[
 ],createPost);
 
 router.put('/like/:id',[
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
 	validateJWT,
 	validateFields
 ], likePost);
 
 router.put('/like/remove/:id',[
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
 	validateJWT,
 	validateFields
 ], removeLike);
 
 router.post('/comment/:id',[
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
 	validateJWT,
 	validateFields
 ], commentPost);
 
 
 router.get('/:id', [
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
+	validateJWT,
 	validateFields
 ], getPost);
 
@@ -52,11 +62,16 @@ router.get('/', [
 
 
 router.put('/retweet/:id', [
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
+
 	validateJWT,
 	validateFields
 ], retweetPost);
 
 router.put('/retweet/remove/:id', [
+	check('id', 'id is required').not().isEmpty(),
+	check('id').isMongoId(),
 	validateJWT,
 	validateFields
 ], removeRetweet);

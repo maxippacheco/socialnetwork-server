@@ -14,6 +14,11 @@ const PostSchema = new Schema({
 	img: { 
 		type: String
 	},
+	status: {
+		type: Boolean,
+		default: true,
+		required: true
+	},
 	likes: [{type: Schema.Types.ObjectId, ref: 'User'}],
 	retweet: [{type: Schema.Types.ObjectId, ref: 'User'}],
 	comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],

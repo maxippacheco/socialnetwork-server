@@ -27,11 +27,22 @@ const likePost = async (req, res) => {
   // thanks copylot ;)
   const { id } = req.params;
 
-  const post = await Post.findById(id).populate({
-    path: "user_id",
-    model: "User",
-    select: "name email username _id",
-  });
+  const post = await Post.findById(id).populate(
+    [{
+      path: "user_id",
+      model: "User",
+      select: "name email username _id img",
+    },
+    {
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "user_id",
+        model: "User",
+        select: "name email username _id img",
+      },
+    }]
+  );
 
   if (!post) {
     return res.status(404).json({
@@ -61,12 +72,22 @@ const likePost = async (req, res) => {
 const removeLike = async (req, res) => {
   const { id } = req.params;
 
-  const post = await Post.findById(id).populate({
-    path: "user_id",
-    model: "User",
-    select: "name email username _id",
-  });
-
+  const post = await Post.findById(id).populate(
+    [{
+      path: "user_id",
+      model: "User",
+      select: "name email username _id img",
+    },
+    {
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "user_id",
+        model: "User",
+        select: "name email username _id img",
+      },
+    }]
+  );
   if (!post) {
     return res.status(404).json({
       ok: false,
@@ -99,11 +120,22 @@ const removeLike = async (req, res) => {
 const retweetPost = async (req, res) => {
   const { id } = req.params;
 
-  const post = await Post.findById(id).populate({
-    path: "user_id",
-    model: "User",
-    select: "name email username _id",
-  });
+  const post = await Post.findById(id).populate(
+    [{
+      path: "user_id",
+      model: "User",
+      select: "name email username _id img",
+    },
+    {
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "user_id",
+        model: "User",
+        select: "name email username _id img",
+      },
+    }]
+  );
 
   if (!post) {
     return res.status(404).json({
@@ -133,11 +165,22 @@ const retweetPost = async (req, res) => {
 const removeRetweet = async (req, res) => {
   const { id } = req.params;
 
-  const post = await Post.findById(id).populate({
-    path: "user_id",
-    model: "User",
-    select: "name email username _id",
-  });
+  const post = await Post.findById(id).populate(
+    [{
+      path: "user_id",
+      model: "User",
+      select: "name email username _id img",
+    },
+    {
+      path: "comments",
+      model: "Comment",
+      populate: {
+        path: "user_id",
+        model: "User",
+        select: "name email username _id img",
+      },
+    }]
+  );
 
   if (!post) {
     return res.status(404).json({
@@ -179,7 +222,7 @@ const commentPost = async (req, res) => {
         {
           path: "comments.user_id",
           model: "User",
-          select: "name email username _id",
+          select: "name email username _id img",
         },
           
       ])
@@ -209,7 +252,7 @@ const commentPost = async (req, res) => {
     [{
       path: "user_id",
       model: "User",
-      select: "name email username _id",
+      select: "name email username _id img",
     },
     {
       path: "comments",
@@ -217,10 +260,10 @@ const commentPost = async (req, res) => {
       populate: {
         path: "user_id",
         model: "User",
-        select: "name email username _id",
+        select: "name email username _id img",
       }
     }]
-  )
+  );
 
 
   res.json({
@@ -250,9 +293,12 @@ const getPost = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
+
+  const query = { status: true };
+
   const [total, posts] = await Promise.all([
-    Post.countDocuments(),
-    Post.find()
+    Post.countDocuments( query ),
+    Post.find( query )
       .populate([
         {
           path: "comments",
@@ -261,7 +307,7 @@ const getPosts = async (req, res) => {
         {
           path: 'user_id',
           model: 'User',
-          select: 'name email username _id'
+          select: 'name email username _id img'
 
         },
         {
@@ -269,12 +315,11 @@ const getPosts = async (req, res) => {
           populate:{
             path: 'user_id',
             model: 'User',
-            select: 'name email username _id'
+            select: 'name email username _id img'
           }
         },
       ])
       .sort({ createdAt: -1 }),
-      // TODO: resolve this
   ]);
 
 
@@ -284,6 +329,32 @@ const getPosts = async (req, res) => {
     posts,
   });
 };
+
+const removePost = async (req, res) => {
+
+  const { id } = req.params;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    return res.status(404).json({
+      ok: false,
+      message: "Post not found",
+    });
+  }
+
+  post.status = false;
+
+  await post.save();
+
+  res.json({
+    ok: true,
+    message: "Post removed",
+    post,
+  });
+}
+
+
 
 // Remember son
 /*
@@ -301,4 +372,5 @@ module.exports = {
   commentPost,
   getPost,
   getPosts,
+  removePost
 };

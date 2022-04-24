@@ -8,6 +8,17 @@ const register = async(req, res) => {
 	try {
 		
 		const { username, name , email, password } = req.body;
+
+		const isValid = await User.findOne({ email });
+
+		if( !isValid ) {
+			return res.status(400).json({
+				ok: false,
+				message: 'Email already exists'
+			});
+		}
+
+
 		const user = new User({ username, name, email, password });
 		
 		const salt = bcryptjs.genSaltSync();
@@ -201,6 +212,27 @@ const getUserByUsername = async(req, res) => {
 	}
 }
 
+// TODO: CREATE HELPER TO VALIDATE IDS IN USER COLLECTION
+const updateUser = async(req, res) => {
+
+   const { id } = req.params;
+   const { _id, password, ...rest } = req.body;
+
+   if ( password ) {
+     	// Encriptar la contraseña
+   	const salt = bcryptjs.genSaltSync();
+   	rest.password = bcryptjs.hashSync( password, salt );
+   }
+
+   const user = await User.findByIdAndUpdate( id, rest, { new: true } );
+
+   res.json({
+		ok: true,
+		user
+	});
+
+}
+
 module.exports = {
 	register,
 	login,
@@ -208,4 +240,5 @@ module.exports = {
 	renewToken,
 	getUsers,
 	getUserByUsername,
+	updateUser
 }

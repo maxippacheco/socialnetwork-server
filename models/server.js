@@ -25,6 +25,7 @@ class Server {
           follow: '/api/follow',
           post: '/api/post',  
           uploads: '/api/uploads',  
+          bookmarks: '/api/bookmarks'
         }
 
         // Conectar a DB
@@ -71,6 +72,7 @@ class Server {
       this.app.use( this.apiRoutes.follow, require('../routes/follow') );
       this.app.use( this.apiRoutes.post, require('../routes/post') );
       this.app.use( this.apiRoutes.uploads, require('../routes/uploads') );
+      this.app.use( this.apiRoutes.bookmarks, require('../routes/bookmarks') );
 
     }
     // Esta configuración se puede tener aquí o como propieda de clase

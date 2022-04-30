@@ -5,7 +5,7 @@ cloudinary.config( process.env.CLODINARY_URL );
 
 
 const deleteImageCloudinary = async (req, res = response) => {
-	const { id, colection } = req.params;
+	const { id } = req.params;
 
 	const user = await User.findById( id );
 
@@ -26,7 +26,13 @@ const deleteImageCloudinary = async (req, res = response) => {
 		})
 	}
 
-	await cloudinary.v2.uploader.destroy(img);
+	const nameArr = img.split('/');
+   //sacar ultima posicion del array
+   const name = nameArr[nameArr.length - 1];
+   const [ public_id ] = name.split('.');
+
+
+	await cloudinary.v2.uploader.destroy(public_id);
 
 	user.img = null;
 	await user.save();

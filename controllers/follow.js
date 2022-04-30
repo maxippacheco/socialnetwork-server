@@ -30,8 +30,8 @@ const followUser = async(req, res) => {
 	user_toFollow.followers.push(user_inSession.id);
 
 
-	await user_inSession.save(),
-	await user_toFollow.save(),
+	await user_inSession.save();
+	await user_toFollow.save();
 	
 
 	res.json({
@@ -41,7 +41,34 @@ const followUser = async(req, res) => {
 	})
 }
 
-// TODO: UNFOLLOW USER
+const unfollowUser = async(req, res) => {
+	
+	// userInSession
+	const user_inSession = await User.findById(req.uid);
+
+	const user_toUnfollow = await User.findById(req.params.id);
+
+	// Validate if the user follow the user already
+	if( !user_toUnfollow.followers.includes( user_inSession.id  ) ){
+		return res.status(400).json({
+			ok: false,
+			msg: 'You do not follow this user'
+		})
+	}
+
+	user_inSession.following.splice( user_inSession.following.indexOf( user_toUnfollow.id ), 1 );
+	user_toUnfollow.followers.splice( user_toUnfollow.followers.indexOf( user_inSession.id ), 1 );
+
+	await user_inSession.save();
+	await user_toUnfollow.save();
+
+	res.json({
+		ok: true,
+		user_inSession,
+		user_toUnfollow
+	})
+
+}
 
 const getFollowers = async(req, res) => {
 
@@ -79,6 +106,7 @@ const getFollowings = async( req, res ) => {
 
 module.exports = {
 	followUser,
+	unfollowUser,
 	getFollowers,
 	getFollowings
 }

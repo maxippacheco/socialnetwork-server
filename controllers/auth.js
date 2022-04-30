@@ -9,14 +9,14 @@ const register = async(req, res) => {
 		
 		const { username, name , email, password } = req.body;
 
-		const isValid = await User.findOne({ email });
+		// const isValid = await User.findOne({ email });
 
-		if( !isValid ) {
-			return res.status(400).json({
-				ok: false,
-				message: 'Email already exists'
-			});
-		}
+		// if( !isValid ) {
+		// 	return res.status(400).json({
+		// 		ok: false,
+		// 		message: 'Email already exists'
+		// 	});
+		// }
 
 
 		const user = new User({ username, name, email, password });

@@ -92,7 +92,7 @@ class Server {
 
     listen(){
       this.server.listen( this.port, () => {
-        console.log('Server corriendo en puerto:', this.port );
+        console.log('Server corriendo en puerto:', this.port || 5000 );
       });
     }
 

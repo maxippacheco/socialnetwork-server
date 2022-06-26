@@ -1,5 +1,5 @@
 const bcryptjs = require('bcryptjs');
-const generateJWT = require('../helpers/create-jwt');
+const {generateJWT} = require('../helpers/create-jwt');
 const { googleVerify } = require('../helpers/google-verify');
 const User = require('../models/user');
 
@@ -49,7 +49,7 @@ const login = async(req, res) => {
 
 	try {
 		
-		const userDB = await User.findOne({ email });
+		const userDB = await User.findOne({ email }).populate('following', 'name username img online');
 
 		if (!userDB) {
 			return res.status(400).json({
@@ -95,7 +95,7 @@ const loginWithGoogle = async(req, res) => {
 		
 		const { email, name, img } = await googleVerify( id_token );
 
-		let user = await User.findOne({ email })
+		let user = await User.findOne({ email }).populate('following', 'name username img online');
 
 		if ( !user ) {
 			

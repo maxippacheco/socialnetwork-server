@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { register, getUsers, login, getUserByUsername, loginWithGoogle, renewToken, updateUser } = require('../controllers/auth');
-const { isValidUserById } = require('../helpers/db-validations');
 const validateFields = require('../middlewares/validate-fields');
 const { validateJWT } = require('../middlewares/validate-jwt');
 

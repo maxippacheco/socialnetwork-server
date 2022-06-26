@@ -24,4 +24,22 @@ const generateJWT = ( uid ) => {
 
 };
 
-module.exports = generateJWT;
+const checkJWT = ( token = '' ) => {
+
+	try {
+		
+		const { uid } = jwt.verify( token, process.env.SECRET_KEY );
+
+		return [ true, uid ]; 
+
+	} catch (error) {
+		return [ false ];
+	}
+
+}
+
+module.exports = {
+	generateJWT,
+	checkJWT
+};
+// module.exports = checkJWT;

@@ -1,5 +1,4 @@
 const Bookmark = require("../models/bookmark");
-const User = require("../models/user");
 const Post = require("../models/post");
 
 const createBookmark = async(req, res) => {
@@ -93,12 +92,44 @@ const removePostFromBookmark = async(req, res) => {
 
 const getBookmarks = async(req, res) => {
 
-	const bookmarks = await Bookmark.find();
+	const bookmarks = await Bookmark.find().populate({
+		path: 'posts',
+		populate: {
+			path: 'user_id',
+			select: 'name email username img'
+		}	
+	});
 
 	res.json({
 		ok: true,
 		message: "Bookmarks retrieved successfully",
 		bookmarks
+	});
+}
+
+const getBookmarkById = async( req, res ) => {
+
+	const { id } = req.params;
+
+	const bookmark = await Bookmark.findById(id).populate({
+		path: 'posts',
+		populate: {
+			path: 'user_id',
+			select: 'name email username img'
+		}
+	});
+
+	if (!bookmark) {
+		return res.status(404).json({
+			ok: false,
+			message: "Bookmark not found"
+		});
+	}
+
+	res.json({
+		ok: true,
+		message: "Bookmark retrieved successfully",
+		bookmark
 	});
 
 
@@ -109,5 +140,6 @@ module.exports = {
 	createBookmark,
 	addPostToBookmark,
 	removePostFromBookmark,
-	getBookmarks
+	getBookmarks,
+	getBookmarkById
 }

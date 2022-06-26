@@ -5,10 +5,12 @@ const http     = require('http');
 const path     = require('path');
 const cors      = require('cors');
 const bodyParser = require('body-parser');
+const socketio  = require('socket.io');
 const { dbConnection } = require('../database/config');
 
 
 const fileUpload = require('express-fileupload');
+const Sockets = require('./socket');
 
 // const Sockets  = require('./sockets');
 
@@ -25,7 +27,8 @@ class Server {
           follow: '/api/follow',
           post: '/api/post',  
           uploads: '/api/uploads',  
-          bookmarks: '/api/bookmarks'
+          bookmarks: '/api/bookmarks',
+          chat: '/api/messages'
         }
 
         // Conectar a DB
@@ -35,11 +38,13 @@ class Server {
         this.server = http.createServer( this.app );
         
         // Configuraciones de sockets
-        //   this.io = socketio( this.server, { /* configuraciones */ } );
+        this.io = socketio( this.server, { /* configuraciones */ } );
 		
 		    this.middlewares();
+        
         // Inicializar sockets
-        //   this.configurarSockets();
+        this.configurarSockets();
+        
         this.routes();
 
 
@@ -73,22 +78,23 @@ class Server {
       this.app.use( this.apiRoutes.post, require('../routes/post') );
       this.app.use( this.apiRoutes.uploads, require('../routes/uploads') );
       this.app.use( this.apiRoutes.bookmarks, require('../routes/bookmarks') );
+      this.app.use( this.apiRoutes.chat, require('../routes/messages') );
 
     }
     // Esta configuración se puede tener aquí o como propieda de clase
     // depende mucho de lo que necesites
-   //  configurarSockets() {
-   //      new Sockets( this.io );
-   //  }
+    configurarSockets() {
+        new Sockets( this.io );
+    }
 
 
         // Inicializar Server
 
-	listen(){
-		this.server.listen( this.port, () => {
-			console.log('Server corriendo en puerto:', this.port );
-		});
-	}
+    listen(){
+      this.server.listen( this.port, () => {
+        console.log('Server corriendo en puerto:', this.port );
+      });
+    }
 
 
 }
